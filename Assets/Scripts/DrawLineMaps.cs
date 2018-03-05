@@ -25,17 +25,10 @@ public class DrawLineMaps : MonoBehaviour {
     private void Awake()
     {
         Instance = this;
-    }
-
-    private void Start()
-    {
         line = GetComponent<LineRenderer>();
-
-        StartCoroutine(DrawLine());
     }
 
-
-    IEnumerator DrawLine()
+    public IEnumerator DrawLine()
     {
         isDrawing = true;
         int mapRandom = Random.Range(0, lineMaps.Length - 1);
@@ -56,14 +49,15 @@ public class DrawLineMaps : MonoBehaviour {
     public IEnumerator EraseLine()
     {
         isDrawing = true;
-        Spawner.Instance.InitRespawnOfDots();
+        Spawner.Instance.InitSpawnOfDots();
         while (line.positionCount > 0)
         {
             line.positionCount--;
 
             yield return null;
         }
-        StartCoroutine(DrawLine());
+        if (GameOverManager.Instance.isPlaying)
+            StartCoroutine(DrawLine());
         StopCoroutine(EraseLine());
     }
 }

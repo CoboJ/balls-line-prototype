@@ -6,6 +6,7 @@ public class BallMove : MonoBehaviour {
 
     public float speedRotation = 200f;
     public float jumpForce = 10f;
+    public GameObject nextBall;
 
     private int cordsNumber = 0;
     private bool isShooting = false;
@@ -23,43 +24,6 @@ public class BallMove : MonoBehaviour {
         speedRotation = Random.Range(150f, 300f);
     }
 
-    private void OnBecameInvisible()
-    {
-        if (isShooting == true)
-        {
-            myRigidbody.velocity = Vector2.zero;
-            DisableDot();
-        }
-    }
-
-    public void DisableDot()
-    {
-        spriteRenderer.enabled = false;
-
-        StartCoroutine(ActivateItSelf());
-    }
-
-    private IEnumerator ActivateItSelf()
-    {
-        if (DrawLineMaps.Instance.isDrawing)
-            yield return new WaitUntil(() => !DrawLineMaps.Instance.isDrawing);
-
-        yield return new WaitForSeconds(Random.Range(2f, 4f));
-
-        if (!spriteRenderer.enabled)
-        {
-            cordsNumber = 0;
-            speedRotation = Random.Range(150f, 300f);
-            transform.position = DrawLineMaps.Instance.line.GetPosition(cordsNumber);
-            myCollider.enabled = true;
-            spriteRenderer.enabled = true;
-            isShooting = false;
-        }
-        myAnimator.Play("GetIn", -1, 0f);
-
-        StopCoroutine(ActivateItSelf());
-    }
-
     public void Shoot()
     {
         if(cordsNumber != DrawLineMaps.Instance.line.positionCount - 1 && isShooting != true && spriteRenderer.enabled == true)
@@ -71,7 +35,7 @@ public class BallMove : MonoBehaviour {
 
     private void Update()
     {
-        if (DrawLineMaps.Instance.isDrawing == false && isShooting == false && cordsNumber < DrawLineMaps.Instance.line.positionCount - 1)
+        if (DrawLineMaps.Instance.isDrawing == false && isShooting == false && cordsNumber < DrawLineMaps.Instance.line.positionCount - 1 && GameOverManager.Instance.isPlaying)
         {
             if (Vector2.Distance(transform.position, DrawLineMaps.Instance.line.GetPosition(cordsNumber)) < 0.2f)
                 cordsNumber++;
@@ -93,10 +57,63 @@ public class BallMove : MonoBehaviour {
     {
         if(collision.CompareTag("DotObjetive") && isShooting == true && collision.transform.GetComponent<SpriteRenderer>().color == spriteRenderer.color)
         {
-            PointManager.Instance.SetPoints(1, spriteRenderer.color, collision.transform);
+            PointManager.Instance.SetPoints(1);
+            Spawner.Instance.SpawnExplosionPS(spriteRenderer.color, collision.transform);
             collision.GetComponent<ObjetiveDots>().DisableDot();
             spriteRenderer.enabled = false;
-            myCollider.enabled = false;
         }
+    }
+
+    private void OnBecameInvisible()
+    {
+        if (isShooting == true)
+        {
+            if (spriteRenderer.enabled == true)
+                GameOverManager.Instance.currentAttempts--;
+            
+            if(GameOverManager.Instance.currentAttempts <= 0)
+                GameOverManager.Instance.GameOver();
+            
+            myRigidbody.velocity = Vector2.zero;
+            DisableDot();
+        }
+    }
+
+    public void DisableDot()
+    {
+        spriteRenderer.enabled = false;
+        myCollider.enabled = false;
+
+        StartCoroutine(ReinitializeBall());
+    }
+
+    private IEnumerator ReinitializeBall()
+    {
+        if (DrawLineMaps.Instance.isDrawing)
+            yield return new WaitUntil(() => !DrawLineMaps.Instance.isDrawing);
+
+        yield return new WaitUntil(() => !Spawner.Instance.isBallSpawning && Spawner.Instance.currentBallToSpawn == gameObject);
+
+        Spawner.Instance.currentBallToSpawn = nextBall;
+        Spawner.Instance.isBallSpawning = true;
+
+        if (!spriteRenderer.enabled)
+        {
+            cordsNumber = 0;
+            speedRotation = Random.Range(150f, 300f);
+            transform.position = DrawLineMaps.Instance.line.GetPosition(cordsNumber);
+            spriteRenderer.enabled = true;
+            myCollider.enabled = true;
+            isShooting = false;
+        }
+        myAnimator.Play("GetIn", -1, 0f);
+
+        if (!GameOverManager.Instance.isPlaying)
+            yield return new WaitUntil(() => GameOverManager.Instance.isPlaying);
+
+        yield return new WaitForSeconds(Random.Range(1f, 3f));
+
+        Spawner.Instance.isBallSpawning = false;
+        StopCoroutine(ReinitializeBall());
     }
 }

@@ -10,7 +10,9 @@ public class GradientBackground : MonoBehaviour {
     public Color endColorBottom;
     public Color endColorTop;
     public float speedToChangeColor = 5f;
-    public Texture[] polygonTextures;
+    public ParticleSystem topPS;
+    public ParticleSystem bottomPS;
+    public Texture[] polygonTexturesToParticles;
 
     [Header("Gradient Colors 1")]
     public Color bottomColor_1;
@@ -35,6 +37,8 @@ public class GradientBackground : MonoBehaviour {
     private void Start()
     {
         quadBackground.localScale = new Vector2(Spawner.Instance.stageDimensions.x + .5f, Spawner.Instance.stageDimensions.y) * 2;
+        topPS.transform.position = new Vector2(0, Spawner.Instance.stageDimensions.y);
+        bottomPS.transform.position = new Vector2(0, -Spawner.Instance.stageDimensions.y);
         SelectColor();
     }
 
@@ -45,6 +49,36 @@ public class GradientBackground : MonoBehaviour {
             gradientMat.SetColor("_Color", Color.Lerp(gradientMat.GetColor("_Color"), endColorBottom, Time.deltaTime * speedToChangeColor)); // the bottom color
             gradientMat.SetColor("_Color2", Color.Lerp(gradientMat.GetColor("_Color2"), endColorTop, Time.deltaTime * speedToChangeColor)); // the top color
         }
+    }
+
+    public void StageParticles()
+    {
+        var mainTop = topPS.main;
+        var mainBottom = bottomPS.main;
+        if (mainTop.startLifetime.constant < 1.85f && mainBottom.startLifetime.constant < 1.85f)
+        {
+            mainTop.startLifetime = mainTop.startLifetime.constant + 0.37f;
+            mainBottom.startLifetime = mainBottom.startLifetime.constant + 0.37f;
+
+            if (!topPS.isPlaying && !bottomPS.isPlaying)
+            {
+                topPS.Play();
+                bottomPS.Play();
+            }
+        }
+        SetTexture();
+    }
+
+    public void RestartParticles()
+    {
+        var mainTop = topPS.main;
+        var mainBottom = bottomPS.main;
+        mainTop.startLifetime = 0f;
+        mainBottom.startLifetime = 0f;
+
+        topPS.Stop();
+        bottomPS.Stop();
+        SelectColor();
     }
 
     public void SelectColor()
@@ -60,7 +94,6 @@ public class GradientBackground : MonoBehaviour {
                 }
                 else
                     SelectColor();
-
                 break;
             case 4:
                 if (endColorTop != topColor_4 && endColorBottom != bottomColor_4)
@@ -106,6 +139,6 @@ public class GradientBackground : MonoBehaviour {
 
     public void SetTexture()
     {
-        particleEffectMat.mainTexture = polygonTextures[Random.Range(0, polygonTextures.Length)];
+        particleEffectMat.mainTexture = polygonTexturesToParticles[Random.Range(0, polygonTexturesToParticles.Length)];
     }
 }

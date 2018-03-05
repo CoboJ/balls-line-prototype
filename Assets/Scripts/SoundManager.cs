@@ -30,4 +30,9 @@ public class SoundManager : MonoBehaviour {
         if (PointManager.Instance.currentPoints < 55)
             musicAS.pitch += 0.05f;
     }
+
+    public void RestartPitch()
+    {
+        musicAS.pitch = 0.8f;
+    }
 }

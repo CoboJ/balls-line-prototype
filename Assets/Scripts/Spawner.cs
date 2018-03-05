@@ -8,21 +8,19 @@ public class Spawner : MonoBehaviour {
 
     public Transform dotsObjetiveHolder;
     public Transform ballsHolder;
-    public ParticleSystem explisonPS;
+    public ParticleSystem explosionPS;
 
-    public float moveSpeed = 5f;
+    public float moveSpeed = 6f;
+    public bool isBallSpawning = false;
     public Vector2 stageDimensions;
+
+    [HideInInspector]
+    public GameObject currentBallToSpawn;
 
     private void Awake()
     {
         Instance = this;
-        stageDimensions = Camera.main.ScreenToWorldPoint(new Vector2(Screen.width, Screen.height)); 
-    }
-
-    private void Start()
-    {
-        InitRespawnOfDots();
-        StartCoroutine(InitSpanwBalls());
+        stageDimensions = Camera.main.ScreenToWorldPoint(new Vector2(Screen.width, Screen.height));
     }
 
     public void SpawnDot(Transform currentDot)
@@ -46,7 +44,7 @@ public class Spawner : MonoBehaviour {
         }
     }
 
-    public void InitRespawnOfDots()
+    public void InitSpawnOfDots()
     {
         foreach (Transform dot in dotsObjetiveHolder)
         {
@@ -54,17 +52,19 @@ public class Spawner : MonoBehaviour {
         }
     }
 
-    IEnumerator InitSpanwBalls()
+    public void InitSpawnOfBalls()
     {
-        yield return new WaitUntil(() => !DrawLineMaps.Instance.isDrawing);
-
         foreach (Transform ball in ballsHolder)
         {
-            ball.gameObject.SetActive(true);
-
-            yield return new WaitForSeconds(1f);
+            ball.GetComponent<Animator>().SetTrigger("Disable");
         }
+    }
 
-        StopCoroutine(InitSpanwBalls());
+    public void SpawnExplosionPS(Color color, Transform pos)
+    {
+        explosionPS.transform.position = pos.position;
+        var main = explosionPS.main;
+        main.startColor = color;
+        explosionPS.Play();
     }
 }

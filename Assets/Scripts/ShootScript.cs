@@ -20,7 +20,7 @@ public class ShootScript : MonoBehaviour
 
     public void ShootBall()
     {
-        if (!DrawLineMaps.Instance.isDrawing)
+        if (!DrawLineMaps.Instance.isDrawing && GameOverManager.Instance.isPlaying)
         {
             SoundManager.Instance.PlayBallClip(SoundManager.Instance.shootClip);
             ballsHolder.GetChild(0).GetComponent<BallMove>().Shoot();

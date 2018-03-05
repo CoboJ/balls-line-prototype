@@ -17,10 +17,10 @@ public class ObjetiveDots : MonoBehaviour {
     {
         spriteRenderer.enabled = false;
 
-        StartCoroutine(SelfActivate());
+        StartCoroutine(ReinitializeDot());
     }
 
-    private IEnumerator SelfActivate()
+    private IEnumerator ReinitializeDot()
     {
         if (DrawLineMaps.Instance.isDrawing)
             yield return new WaitUntil(() => !DrawLineMaps.Instance.isDrawing);
@@ -34,6 +34,6 @@ public class ObjetiveDots : MonoBehaviour {
         }
         myAnimator.Play("GetIn", -1, 0f);
 
-        StopCoroutine(SelfActivate());
+        StopCoroutine(ReinitializeDot());
     }
 }
