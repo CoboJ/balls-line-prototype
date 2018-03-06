@@ -4409,7 +4409,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 460153401}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -1, y: 8, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 2051938242}
@@ -9510,9 +9510,9 @@ MonoBehaviour:
   ballsHolder: {fileID: 1608788365}
   explosionPS: {fileID: 565997572}
   moveSpeed: 5
-  isBallSpawning: 0
   stageDimensions: {x: 0, y: 0}
   currentBallToSpawn: {fileID: 147651269}
+  balls: []
 --- !u!4 &1227974131
 Transform:
   m_ObjectHideFlags: 0
@@ -13703,7 +13703,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1608788364}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1, y: 8, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 147651270}

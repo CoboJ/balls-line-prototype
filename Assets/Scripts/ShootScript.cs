@@ -33,10 +33,14 @@ public class ShootScript : MonoBehaviour
     {
         ballsHolder.GetChild(0).SetAsLastSibling();
 
+        SetAiming();
+    }
+
+    public void SetAiming()
+    {
         aiming.transform.position = ballsHolder.GetChild(0).position;
         aiming.transform.rotation = ballsHolder.GetChild(0).rotation;
         aiming.transform.SetParent(ballsHolder.GetChild(0).transform);
         aimingAnim.Play();
-
     }
 }
